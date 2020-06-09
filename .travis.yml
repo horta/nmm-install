@@ -1,0 +1,27 @@
+language: c
+jobs:
+  include:
+    - os: linux
+      sudo: required
+      before_script: test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
+    - os: osx
+addons:
+  apt:
+    packages:
+      - cmake
+script:
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm DO_CMD=sudo bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=nmm DO_CMD=sudo bash
+  - test -e /usr/local/include/nmm/nmm.h
+  - test -e /usr/local/lib/cmake/nmm/nmm-config.cmake
+  - test -e /usr/local/lib/cmake/nmm/nmm-targets-release.cmake
+  - test -e /usr/local/lib/cmake/nmm/nmm-targets.cmake
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l /usr/local/lib/libnmm.dylib | grep -q LC_RPATH; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e /usr/local/lib/libnmm.so; fi
+notifications:
+  email:
+    recipients:
+      - danilo.horta@pm.me
+    on_success: never
+    on_failure: always
